@@ -2,6 +2,7 @@ from django.db import transaction
 from django.db.models import F
 from apps.orders.models import Order, OrderItem
 from apps.stores.models import Inventory
+from apps.orders.tasks import send_order_confirmation
 
 
 @transaction.atomic
@@ -54,4 +55,7 @@ def create_order(store, items):
     order.status = Order.STATUS_CONFIRMED
     order.save(update_fields=["status"])
 
+    # Trigger asynchronous confirmation task
+    send_order_confirmation.delay(order.id)
+    
     return order

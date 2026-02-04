@@ -125,10 +125,18 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+REDIS_URL = "redis://localhost:6379/0"
 
+# Caching Configuration
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
+        "LOCATION": REDIS_URL,
     }
 }
+
+# Celery Configuration 
+CELERY_BROKER_URL = REDIS_URL
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_BACKEND = "django-db"
