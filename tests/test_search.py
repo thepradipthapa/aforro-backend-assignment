@@ -1,9 +1,6 @@
 import pytest
-from django.urls import reverse
 from rest_framework.test import APIClient
 from apps.products.models import Category, Product
-from apps.stores.models import Store, Inventory
-from apps.orders.models import Order
 
 @pytest.mark.django_db
 def test_product_search_by_keyword():

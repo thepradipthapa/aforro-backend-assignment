@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "aforro_app"
+    container_name: "aforro_app"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/code
+      - /code/.venv
+    depends_on:
+      - redis
+      - db
+    command: > 
+      bash -c "
+      uv run manage.py makemigrations &&
+      uv run manage.py migrate &&
+      uv run manage.py runserver 0.0.0.0:8000"
+    restart: always
+
+  db:
+    image: postgres:16
+    container_name: aforro_db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aforro_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "aforro_celery"
+    container_name: "aforro_celery"
+    env_file:
+      - .env
+    volumes:
+      - .:/code
+      - /code/.venv
+    depends_on:
+      - db
+      - redis
+    command: >
+      bash -c "
+      uv run celery -A aforro_backend  worker --loglevel=info"
+    restart: unless-stopped
+
+
+  redis:
+    image: "redis:7"
+    container_name: "aforro_redis"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
+
+volumes:
+  redis_data:
+  postgres_data:
