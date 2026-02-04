@@ -62,18 +62,21 @@ class ProductSearchAPIView(APIView):
 
         # Sorting
         sort = params.get("sort")
+
         if sort == "price":
             qs = qs.order_by("price")
         elif sort == "newest":
             qs = qs.order_by("-created_at")
-
+        else:
+            qs = qs.order_by("-created_at")
+            
         paginator = ProductSearchPagination()
         page = paginator.paginate_queryset(qs, request)
 
         data = ProductSearchSerializer(page, many=True).data
         response = paginator.get_paginated_response(data).data
 
-        cache.set(cache_key, response, timeout=60)  # 1 minute cache
+        cache.set(cache_key, response, timeout=60)  
 
         return Response(response)
 
@@ -109,6 +112,6 @@ class ProductSuggestAPIView(APIView):
 
         results = prefix_matches + contains_matches
 
-        cache.set(cache_key, results, timeout=300)  # 5 min cache
+        cache.set(cache_key, results, timeout=300) 
 
         return Response(results)
