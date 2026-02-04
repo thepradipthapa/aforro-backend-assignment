@@ -94,6 +94,11 @@ docker exec -it aforro_app uv run python manage.py seed_data
   ]
 }
 ```
+**Response:**
+
+CONFIRMED → stock available, quantities deducted
+
+REJECTED → insufficient stock, no deduction
 
 
 ###  2. Product Search API
@@ -101,6 +106,24 @@ docker exec -it aforro_app uv run python manage.py seed_data
 **Endpoint:** `GET http://localhost:8000/api/search/products/?q=iphone&store_id=2&in_stock=true&sort=price`
 
 **Description:** Search products with keyword, category, price range, sorting, and pagination.
+
+### 3. Store Order Listing
+
+**Endpoint:** `GET http://localhost:8000/stores/1/orders/`
+
+**Description:** Return a list of all orders belonging to the store:
+
+### 4. Inventory Listing
+**Endpoint:** `GET http://localhost:8000/stores/1/inventory/`
+
+**Description:** Return inventory items for that store including:
+
+### 5. Autocomplete
+**Endpoint:** `GET http://localhost:8000/api/search/suggest/?q=iph`
+
+**Description:** eturns up to 10 product titles starting with the query prefix (iph). Minimum 3 characters required.
+
+
 
 ---
 
